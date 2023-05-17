@@ -1,0 +1,22 @@
+ Write a C program that redirects standard output to a file output.txt. (use dup and open
+system calls).
+
+#include<stdio.h>
+#include<unistd.h>
+#include<fcntl.h>
+#include<string.h>
+#include<sys/types.h>
+int main(int ac,char *av[])
+{
+	int fd, fd1;
+	char str[] = "Hello!!";
+	if(ac<2)
+	{
+		printf("No such file in the directory");
+		return(0);
+	}
+	close(1);
+	fd = open(av[1],O_WRONLY | O_CREAT | O_EXCL, 0777);
+	write(1, str,strlen(str));
+	close(fd);
+}

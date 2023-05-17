@@ -1,0 +1,41 @@
+Write a C program which executes two cleanup functions when it terminates. In one
+cleanup function it prints a message “Doing clean up work, Closing files” in another
+function it prints “doing cleanup work, freeing memory” 
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<fcntl.h>
+int f1,f2;
+char *a1,*a2;
+void close_files()
+{
+	printf("Doing clean up work, Closing files...\n");
+	close(f1);
+	close(f2);
+}
+void free_memory()
+{
+	printf("Doing clean up work,Freeing the array memory...\n");
+	free(a1);
+	free(a2);
+}
+int main()
+{
+	f1=open("file1.txt",O_RDONLY);
+	f2=open("file2.txt",O_RDONLY);
+
+	
+	
+	a1 = (int*) malloc(sizeof(int) *10);
+	a2 = (int*) malloc(sizeof(int) *10);
+	
+	printf("Executing atexit...\n");
+	atexit(close_files);
+	atexit(free_memory);
+
+	exit(0);
+}
+
+-----------------------------------------------------------------------------------------------------------------------
+
+In this program, the atexit function is used to register the cleanup functions cleanupFiles and cleanupMemory to be executed when the program terminates. The atexit function takes a function pointer as an argument, and the registered cleanup functions will be called in the reverse order of their registration (i.e., the last registered function will be called first). Inside the cleanup functions, you can perform the required cleanup tasks, such as closing files and freeing memory.

@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    int pipefd[2];
+    pid_t ls_pid, wc_pid;
+
+    // Create the pipe
+    if (pipe(pipefd) == -1) {
+        perror("pipe");
+        exit(1);
+    }
+
+    // Fork the first child process to execute 'ls' command
+    ls_pid = fork();
+
+    if (ls_pid == -1) {
+        perror("fork");
+        exit(1);
+    } else if (ls_pid == 0) {
+        // Child process 1 (ls)
+        // Redirect stdout to the write end of the pipe
+        close(STDOUT_FILENO);
+        dup(pipefd[1]);
+        // Close unused pipe ends
+        close(pipefd[0]);
+        close(pipefd[1]);
+        // Execute 'ls' command
+        execlp("ls", "ls", NULL);
+        perror("execlp ls");
+        exit(1);
+    }
+
+    // Fork the second child process to execute 'wc' command
+    wc_pid = fork();
+
+    if (wc_pid == -1) {
+        perror("fork");
+        exit(1);
+    } else if (wc_pid == 0) {
+        // Child process 2 (wc)
+        // Redirect stdin to the read end of the pipe
+        close(STDIN_FILENO);
+        dup(pipefd[0]);
+        // Close unused pipe ends
+        close(pipefd[0]);
+        close(pipefd[1]);
+        // Execute 'wc' command
+        execlp("wc", "wc", NULL);
+        perror("execlp wc");
+        exit(1);
+    }
+
+    // Parent process
+    // Close unused pipe ends
+    close(pipefd[0]);
+    close(pipefd[1]);
+    // Wait for child processes to finish
+    wait(NULL);
+    wait(NULL);
+
+    return 0;
+}

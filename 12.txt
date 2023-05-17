@@ -1,0 +1,36 @@
+ Write a C program to move the content of file1.txt to file2.txt, remove the file file1.txt
+from directory and rename file2.txt as file1.txt.
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<fcntl.h>
+int f1,f2,i,j;
+char *a1,*a2;
+void close_files()
+{
+	printf("Closing files...\n");
+	close(f1);
+	close(f2);
+}
+void free_memory()
+{
+	printf("Freeing the array memory...\n");
+	free(a1);
+	free(a2);
+}
+int main()
+{
+	f1=open("file1.txt",O_RDONLY);
+	f2=open("file2.txt",O_RDONLY);
+	
+	printf("Executing atexit...\n");
+	atexit(close_files);
+	atexit(free_memory);
+	
+	a1 = (int*) malloc(sizeof(int) *10);
+	a2 = (int*) malloc(sizeof(int) *10);
+	
+	exit(0);
+}
+
+

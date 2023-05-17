@@ -1,0 +1,38 @@
+Write a C program to Identify the type (Directory, character device, Block device,
+Regular file, FIFO or pipe, symbolic link or socket) of files given as command line
+arguments.(use stat() system call).
+
+#include<stdio.h>
+#include<sys/stat.h>
+int main(int ac,char *av[])
+{
+	int i;
+	struct stat s;
+	if(ac<2)
+	{
+		printf("No command line arguments passed.");
+		return(0);
+	}
+	else
+	{
+		for(i=0;i<ac;i++)
+		{
+			stat(av[i],&s);
+			if(S_ISREG(s.st_mode))
+				printf("%s is a regular file.\n",av[i]);
+			else if(S_ISDIR(s.st_mode))
+				printf("%s is a directory file.\n",av[i]);
+			else if(S_ISCHR(s.st_mode))
+				printf("%s is a character file.\n",av[i]);		
+			else if(S_ISBLK(s.st_mode))
+				printf("%s is a block file.\n",av[i]);
+			else if(S_ISFIFO(s.st_mode))
+				printf("%s is a pipe file.\n",av[i]);
+			else if(S_ISLNK(s.st_mode))
+				printf("%s is a link file.\n",av[i]);
+			else if(S_ISSOCK(s.st_mode))
+				printf("%s is a socket file.\n",av[i]);
+		
+		}
+	}
+}

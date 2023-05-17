@@ -1,0 +1,25 @@
+ Write a C program to show how the file read/write offset is shared using dup() system
+call. 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+int main() {
+    int fd1, fd2;
+    char str[20];
+	fd1=open("sample.txt",O_RDONLY);
+	fd2 = dup(fd1);
+	read(fd1,str,5);
+	read(fd2,str,7);
+	close(fd1);
+      close(fd2);
+}
+
+
+
+sample.txt : Hello World!
+
+
+

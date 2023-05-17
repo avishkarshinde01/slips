@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <string.h>
+
+int main() {
+    char *dir_name = "."; // Current directory
+
+    DIR *dir = opendir(dir_name);
+    if (dir == NULL) {
+        printf("Unable to open directory: %s\n", dir_name);
+        return 1;
+    }
+
+    struct dirent *entry;
+    struct stat file_info;
+
+    struct tm start_tm = {0};
+    start_tm.tm_year = 123; // 2023 (year - 1900)
+    start_tm.tm_mon = 4;   // May (month - 1)
+    start_tm.tm_mday = 1;  // 1st
+    start_tm.tm_hour = 0;  // 00:00:00
+
+    time_t start_time = mktime(&start_tm);
+
+    struct tm end_tm = {0};
+    end_tm.tm_year = 123;   // 2023 (year - 1900)
+    end_tm.tm_mon = 4;     // May (month - 1)
+    end_tm.tm_mday = 15;   // 15th
+    end_tm.tm_hour = 23;   // 23:59:59
+    end_tm.tm_min = 59;
+    end_tm.tm_sec = 59;
+
+    time_t end_time = mktime(&end_tm);
+
+    while ((entry = readdir(dir)) != NULL) {
+        char file_path[256];
+        strcpy(file_path, dir_name);
+        strcat(file_path, "/");
+        strcat(file_path, entry->d_name);
+
+        if (stat(file_path, &file_info) == 0) {
+            time_t file_time = file_info.st_ctime;
+            if (file_time >= start_time && file_time <= end_time) {
+                printf("%s (inode: %ld)\n", entry->d_name, (long)file_info.st_ino);
+            }
+        }
+    }
+
+    closedir(dir);
+
+    return 0;
+}
+----------------------------------------------------------------------------------------------
+
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <time.h>
+
+int main() {
+    char *dir_name = "."; // Current directory
+
+    DIR *dir = opendir(dir_name);
+    if (dir == NULL) {
+        printf("Unable to open directory: %s\n", dir_name);
+        return 1;
+    }
+
+    struct dirent *entry;
+    struct stat file_info;
+
+    time_t start_time = 1651392000; // 1st May 2023, 00:00:00
+    time_t end_time = 1652644800; // 15th May 2023, 23:59:59
+
+    while ((entry = readdir(dir)) != NULL) {
+        char file_path[256];
+        sprintf(file_path, "%s/%s", dir_name, entry->d_name);
+
+        if (stat(file_path, &file_info) == 0) {
+            time_t file_time = file_info.st_ctime;
+            if (file_time >= start_time && file_time <= end_time) {
+                printf("%s (inode: %ld)\n", entry->d_name, (long)file_info.st_ino);
+            }
+        }
+    }
+
+    closedir(dir);
+
+    return 0;
+}

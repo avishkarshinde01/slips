@@ -1,0 +1,45 @@
+Write a C program in which process opens one file for reading and another for writing. It
+reads alternate characters from file and writes them in another file.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#define BUFFER_SIZE 1
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Usage: %s <input_file> <output_file>\n", argv[0]);
+        return 1;
+    }
+
+    int input_fd = open(argv[1], O_RDONLY);
+    if (input_fd == -1) {
+        perror("open");
+        return 1;
+    }
+
+    int output_fd = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (output_fd == -1) {
+        perror("open");
+        close(input_fd);
+        return 1;
+    }
+
+    char buffer[BUFFER_SIZE];
+    int even = 1;
+
+    int num_read;
+    while ((num_read = read(input_fd, buffer, BUFFER_SIZE)) > 0) {
+        if (even) {
+            write(output_fd, buffer, num_read);
+        }
+        even = !even;
+    }
+
+    close(input_fd);
+    close(output_fd);
+
+    return 0;
+}

@@ -1,0 +1,26 @@
+ Write a C program to find properties of file such as inode number, number of hard link,
+File permissions, File size, of a given file using fstat() system call
+
+#include<stdio.h>
+#include<sys/stat.h>
+int main(int ac,char *av[])
+{
+	int i;
+	struct stat s;
+	if(ac<2)
+	{
+		printf("No command line arguments passed.");
+		return(0);
+	}
+	else
+	{
+		for(i=0;i<ac;i++)
+		{
+			stat(av[i],&s);
+			printf("Inode no. of file %s = %ld \n",av[i],s.st_ino);
+			printf("Number of hard links: %ld\n", s.st_nlink);
+    			printf("File permissions: %o\n", s.st_mode & 0777);
+    			printf("File size: %ld bytes\n", s.st_size);
+		}
+	}
+}
